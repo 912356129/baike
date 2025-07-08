@@ -58,6 +58,20 @@
             .content-area{padding:20px;}
             .form-row{grid-template-columns:1fr;}
         }
+        @media (max-width:480px) {
+    .container { padding: 6px; }
+    .header { margin-bottom: 24px; }
+    .brand-title { flex-direction: column; gap: 5px; }
+    .brand-name, .app-title { font-size: 1.2rem !important; }
+    .main-content { border-radius: 0; box-shadow: none; }
+    .content-area { padding: 10px; min-height: 400px; }
+    .form-label { font-size: .95rem; }
+    .form-input, .form-textarea { font-size: 1rem; padding: 10px 8px; }
+    .form-group { margin-bottom: 16px; }
+    .navigation { flex-direction: column; gap: 10px; margin-top: 20px; padding-top: 10px; }
+    .nav-btn, .nav-btn.secondary { width: 100%; min-width: 0; }
+    .export-options { flex-direction: column; gap: 12px !important; }
+}
     </style>
 </head>
 <body>
