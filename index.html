@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百科矩阵 · 企业百科词条模板生成器</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .brand-name {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+
+        .brand-separator {
+            font-size: 2rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: #f8fafc;
+            padding: 30px 20px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .progress-indicator {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 14.28%;
+            transition: width 0.3s ease;
+        }
+
+        .step-counter {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .steps-list {
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .step-item:hover {
+            background: #e2e8f0;
+            padding-left: 10px;
+        }
+
+        .step-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding-left: 10px;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-right: 12px;
+        }
+
+        .step-item.active .step-number {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .content-area {
+            padding: 40px;
+            min-height: 700px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-header {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .example-box {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .example-label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .timeline-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        .add-timeline-btn, .remove-timeline-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .remove-timeline-btn {
+            background: #ef4444;
+            float: right;
+        }
+
+        .add-timeline-btn:hover {
+            background: #059669;
+        }
+
+        .remove-timeline-btn:hover {
+            background: #dc2626;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-btn.secondary {
+            background: #6b7280;
+        }
+
+        .export-section {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .export-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .export-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .export-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .export-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .export-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .preview-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .brand-title {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .brand-name {
+                font-size: 2.2rem;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: 2;
+                border-right: none;
+                border-top: 1px solid #e2e8f0;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .export-options {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .business-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .honor-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .brand-icon {
+            font-size: 2.5rem;
+            color: #f0f8ff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-title">
+                <i class="fas fa-cube brand-icon"></i>
+                <span class="brand-name">百科矩阵</span>
+                <span class="brand-separator">·</span>
+                <span class="app-title">企业百科词条模板生成器</span>
+            </div>
+            <p>专业的企业信息录入工具，分步引导，轻松创建企业百科词条</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="progress-indicator">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="step-counter">步骤 <span id="currentStepNum">1</span> / 7</div>
+                </div>
+
+                <ul class="steps-list">
+                    <li class="step-item active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-text">基本信息</div>
+                    </li>
+                    <li class="step-item" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-text">公司概况</div>
+                    </li>
+                    <li class="step-item" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-text">发展历程</div>
+                    </li>
+                    <li class="step-item" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-text">业务内容</div>
+                    </li>
+                    <li class="step-item" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-text">公司规模</div>
+                    </li>
+                    <li class="step-item" data-step="6">
+                        <div class="step-number">6</div>
+                        <div class="step-text">荣誉文化</div>
+                    </li>
+                    <li class="step-item" data-step="7">
+                        <div class="step-number">7</div>
+                        <div class="step-text">预览导出</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <!-- 步骤1: 基本信息 -->
+                <div class="step-content active" id="step1">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-info-circle"></i> 基本信息</h2>
+                        <p class="step-description">请填写企业的基本信息，这些信息将作为百科词条的开头部分。</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">公司名称 *</label>
+                            <input type="text" class="form-input" id="companyName" placeholder="请输入公司全称">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                北京创新科技有限公司
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">外文名称</label>
+                            <input type="text" class="form-input" id="englishName" placeholder="请输入英文名称">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                Beijing Innovation Technology Co., Ltd.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">成立时间 *</label>
+                            <input type="date" class="form-input" id="foundDate">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                2018年3月15日
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">法定代表人 *</label>
+                            <input type="text" class="form-input" id="legalPerson" placeholder="请输入法定代表人姓名">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                张伟
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">创始人</label>
+                            <input type="text" class="form-input" id="founder" placeholder="请输入创始人姓名">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                张伟、李明
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">所属行业 *</label>
+                            <input type="text" class="form-input" id="industry" placeholder="请输入所属行业">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                互联网科技、人工智能
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">公司地址 *</label>
+                        <input type="text" class="form-input" id="address" placeholder="请输入公司总部地址">
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            北京市海淀区中关村软件园二期8号楼华夏银行大厦
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2: 公司概况 -->
+                <div class="step-content" id="step2">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-building"></i> 公司概况</h2>
+                        <p class="step-description">详细描述公司的主营业务、经营范围和融资情况。</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">主营业务 *</label>
+                        <textarea class="form-input form-textarea" id="mainBusiness" placeholder="请描述公司的核心业务"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            专注于人工智能技术研发和应用，主要业务包括智能语音识别、自然语言处理、计算机视觉等领域的技术服务，为企业提供智能化解决方案。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">经营范围</label>
+                        <textarea class="form-input form-textarea" id="businessScope" placeholder="请输入详细的经营范围"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            技术开发、技术推广、技术转让、技术咨询、技术服务；软件开发；计算机系统服务；基础软件服务；应用软件服务；数据处理；计算机技术培训。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">融资情况</label>
+                        <textarea class="form-input form-textarea" id="funding" placeholder="请描述公司的融资历程"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            2019年完成天使轮融资500万元，投资方为创新工场；2021年完成A轮融资2000万元，由红杉资本领投；2023年完成B轮融资8000万元，由腾讯投资领投。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3: 发展历程 -->
+                <div class="step-content" id="step3">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-timeline"></i> 发展历程</h2>
+                        <p class="step-description">按时间顺序记录公司发展过程中的重要事件和里程碑。</p>
+                    </div>
+
+                    <div id="timelineContainer">
+                        <div class="timeline-item">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">时间</label>
+                                    <input type="text" class="form-input timeline-date" placeholder="年份或具体时间">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">事件描述</label>
+                                    <input type="text" class="form-input timeline-event" placeholder="描述重要事件">
+                                </div>
+                            </div>
+                            <button type="button" class="remove-timeline-btn" onclick="removeTimelineItem(this)">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-timeline-btn" onclick="addTimelineItem()">
+                        <i class="fas fa-plus"></i> 添加时间节点
+                    </button>
+
+                    <div class="example-box" style="margin-top: 20px;">
+                        <span class="example-label">示例时间线：</span>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li><strong>2018年3月</strong> - 公司正式成立，获得首笔种子资金</li>
+                            <li><strong>2019年6月</strong> - 发布首款AI语音产品，获得市场认可</li>
+                            <li><strong>2020年12月</strong> - 员工规模扩大至100人，完成A轮融资</li>
+                            <li><strong>2022年8月</strong> - 在上海设立分公司，业务拓展至华东地区</li>
+                            <li><strong>2023年10月</strong> - 荣获"年度最具创新力企业"奖项</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 步骤4: 业务内容 -->
+                <div class="step-content" id="step4">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-briefcase"></i> 业务内容</h2>
+                        <p class="step-description">详细描述公司各项业务板块和核心产品服务。</p>
+                    </div>
+
+                    <div id="businessContainer">
+                        <div class="business-item">
+                            <div class="form-group">
+                                <label class="form-label">业务板块名称</label>
+                                <input type="text" class="form-input business-name" placeholder="业务板块名称">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">业务详细描述</label>
+                                <textarea class="form-input form-textarea business-desc" placeholder="详细描述该业务板块"></textarea>
+                            </div>
+                            <button type="button" class="remove-timeline-btn" onclick="removeBusinessItem(this)">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-timeline-btn" onclick="addBusinessItem()">
+                        <i class="fas fa-plus"></i> 添加业务板块
+                    </button>
+
+                    <div class="example-box" style="margin-top: 20px;">
+                        <span class="example-label">示例业务板块：</span>
+                        <div style="margin-top: 10px;">
+                            <p><strong>智能语音识别</strong></p>
+                            <p style="margin-left: 20px; color: #64748b;">提供高精度的语音识别技术，支持多种语言和方言，广泛应用于智能客服、语音助手等场景。准确率达到98%以上，支持实时语音转文字。</p>
+                            
+                            <p style="margin-top: 15px;"><strong>自然语言处理</strong></p>
+                            <p style="margin-left: 20px; color: #64748b;">基于深度学习的NLP技术，提供文本分析、情感分析、智能问答等服务，帮助企业提升客户服务质量和运营效率。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤5: 公司规模 -->
+                <div class="step-content" id="step5">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-chart-line"></i> 公司规模</h2>
+                        <p class="step-description">展示公司的规模数据，包括员工数量、资产情况、分支机构等。</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">员工总数</label>
+                            <input type="number" class="form-input" id="employeeCount" placeholder="员工人数">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                350人
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">注册资本</label>
+                            <input type="text" class="form-input" id="registeredCapital" placeholder="注册资本金额">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                5000万元人民币
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">分支机构数量</label>
+                            <input type="number" class="form-input" id="branchCount" placeholder="分公司或办事处数量">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                8个分公司（北京总部、上海、深圳、杭州、成都、武汉、西安、南京）
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">年营业额</label>
+                            <input type="text" class="form-input" id="revenue" placeholder="年度营业收入">
+                            <div class="example-box">
+                                <span class="example-label">示例：</span>
+                                2.8亿元人民币（2023年）
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">业务覆盖范围</label>
+                        <textarea class="form-input form-textarea" id="coverage" placeholder="描述业务覆盖的地区或行业"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            业务覆盖全国30多个省市，服务客户超过2000家，涵盖金融、教育、医疗、政府、电商等多个行业领域。在海外市场，产品已进入东南亚、欧洲等地区。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤6: 荣誉文化 -->
+                <div class="step-content" id="step6">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-trophy"></i> 荣誉与企业文化</h2>
+                        <p class="step-description">记录公司获得的荣誉奖项以及企业文化理念。</p>
+                    </div>
+
+                    <h3 style="margin-bottom: 20px; color: #374151;">所获荣誉</h3>
+                    <div id="honorContainer">
+                        <div class="honor-item">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">获奖年份</label>
+                                    <input type="text" class="form-input honor-year" placeholder="年份">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">奖项名称</label>
+                                    <input type="text" class="form-input honor-name" placeholder="奖项或荣誉名称">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">颁奖机构</label>
+                                <input type="text" class="form-input honor-org" placeholder="颁奖机构或组织">
+                            </div>
+                            <button type="button" class="remove-timeline-btn" onclick="removeHonorItem(this)">
+                                <i class="fas fa-trash"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-timeline-btn" onclick="addHonorItem()">
+                        <i class="fas fa-plus"></i> 添加荣誉奖项
+                    </button>
+
+                    <h3 style="margin: 40px 0 20px 0; color: #374151;">企业文化</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">企业愿景</label>
+                        <textarea class="form-input form-textarea" id="vision" placeholder="描述企业的长远愿景"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            成为全球领先的人工智能技术服务提供商，用AI技术让世界更美好。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">企业使命</label>
+                        <textarea class="form-input form-textarea" id="mission" placeholder="描述企业的使命和责任"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            通过创新的AI技术和优质的服务，帮助客户提升效率、降低成本，推动社会数字化转型。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">核心价值观</label>
+                        <textarea class="form-input form-textarea" id="values" placeholder="描述企业的核心价值观"></textarea>
+                        <div class="example-box">
+                            <span class="example-label">示例：</span>
+                            创新、诚信、合作、卓越。我们相信技术改变世界，坚持以客户为中心，追求极致的产品和服务品质。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤7: 预览导出 -->
+                <div class="step-content" id="step7">
+                    <div class="step-header">
+                        <h2 class="step-title"><i class="fas fa-eye"></i> 预览与导出</h2>
+                        <p class="step-description">查看完整的企业百科词条内容，并选择导出方式。</p>
+                    </div>
+
+                    <div class="preview-section">
+                        <div class="preview-title">
+                            <i class="fas fa-file-alt"></i> 词条预览
+                        </div>
+                        <div class="preview-content" id="previewContent">
+                            <p style="color: #64748b; text-align: center; padding: 40px;">请先完成前面的步骤填写，然后返回此页面查看预览</p>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <h3 style="color: #374151; margin-bottom: 10px;">选择导出方式</h3>
+                        <p style="color: #64748b;">根据您的需要选择合适的导出格式</p>
+                        
+                        <div class="export-options">
+                            <div class="export-card" onclick="exportBlankTemplate()">
+                                <div class="export-icon">
+                                    <i class="fas fa-file-download"></i>
+                                </div>
+                                <div class="export-title">下载空白模板</div>
+                                <div class="export-description">
+                                    下载标准的企业百科词条空白模板，可供其他企业参考使用。
+                                </div>
+                            </div>
+
+                            <div class="export-card" onclick="exportFilledContent()">
+                                <div class="export-icon">
+                                    <i class="fas fa-file-export"></i>
+                                </div>
+                                <div class="export-title">导出填写内容</div>
+                                <div class="export-description">
+                                    导出已填写的企业信息，生成完整的百科词条文档。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 导航按钮 -->
+                <div class="navigation">
+                    <button class="nav-btn secondary" id="prevBtn" onclick="previousStep()" disabled>
+                        <i class="fas fa-arrow-left"></i> 上一步
+                    </button>
+                    
+                    <button class="nav-btn" id="nextBtn" onclick="nextStep()">
+                        下一步 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            loadSavedData();
+        });
+
+        // 步骤导航
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                if (validateCurrentStep()) {
+                    saveCurrentStepData();
+                    currentStep++;
+                    showStep(currentStep);
+                    updateProgress();
+                    updateNavigation();
+                }
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                saveCurrentStepData();
+                currentStep--;
+                showStep(currentStep);
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function goToStep(step) {
+            if (step !== currentStep) {
+                saveCurrentStepData();
+                currentStep = step;
+                showStep(currentStep);
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function showStep(step) {
+            // 隐藏所有步骤
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 显示当前步骤
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // 更新侧边栏
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${step}"]`).classList.add('active');
+
+            // 如果是预览步骤，生成预览内容
+            if (step === 7) {
+                generatePreview();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('currentStepNum').textContent = currentStep;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentStep === 1;
+            
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        // 侧边栏点击事件
+        document.querySelectorAll('.step-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const step = parseInt(this.dataset.step);
+                goToStep(step);
+            });
+        });
+
+        // 表单验证
+        function validateCurrentStep() {
+            const requiredFields = [];
+            
+            switch(currentStep) {
+                case 1:
+                    requiredFields.push('companyName', 'foundDate', 'legalPerson', 'industry', 'address');
+                    break;
+                case 2:
+                    requiredFields.push('mainBusiness');
+                    break;
+            }
+            
+            for (let fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    showToast(`请填写必填字段：${field.previousElementSibling.textContent}`, 'error');
+                    field.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // 动态添加时间线项目
+        function addTimelineItem() {
+            const container = document.getElementById('timelineContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            newItem.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">时间</label>
+                        <input type="text" class="form-input timeline-date" placeholder="年份或具体时间">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">事件描述</label>
+                        <input type="text" class="form-input timeline-event" placeholder="描述重要事件">
+                    </div>
+                </div>
+                <button type="button" class="remove-timeline-btn" onclick="removeTimelineItem(this)">
+                    <i class="fas fa-trash"></i> 删除
+                </button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function removeTimelineItem(btn) {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            if (timelineItems.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                showToast('至少需要保留一个时间节点', 'warning');
+            }
+        }
+
+        // 动态添加业务项目
+        function addBusinessItem() {
+            const container = document.getElementById('businessContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'business-item';
+            newItem.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">业务板块名称</label>
+                    <input type="text" class="form-input business-name" placeholder="业务板块名称">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">业务详细描述</label>
+                    <textarea class="form-input form-textarea business-desc" placeholder="详细描述该业务板块"></textarea>
+                </div>
+                <button type="button" class="remove-timeline-btn" onclick="removeBusinessItem(this)">
+                    <i class="fas fa-trash"></i> 删除
+                </button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function removeBusinessItem(btn) {
+            const businessItems = document.querySelectorAll('.business-item');
+            if (businessItems.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                showToast('至少需要保留一个业务板块', 'warning');
+            }
+        }
+
+        // 动态添加荣誉项目
+        function addHonorItem() {
+            const container = document.getElementById('honorContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'honor-item';
+            newItem.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">获奖年份</label>
+                        <input type="text" class="form-input honor-year" placeholder="年份">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">奖项名称</label>
+                        <input type="text" class="form-input honor-name" placeholder="奖项或荣誉名称">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">颁奖机构</label>
+                    <input type="text" class="form-input honor-org" placeholder="颁奖机构或组织">
+                </div>
+                <button type="button" class="remove-timeline-btn" onclick="removeHonorItem(this)">
+                    <i class="fas fa-trash"></i> 删除
+                </button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function removeHonorItem(btn) {
+            const honorItems = document.querySelectorAll('.honor-item');
+            if (honorItems.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                showToast('至少需要保留一个荣誉项目', 'warning');
+            }
+        }
+
+        // 数据保存和加载
+        function saveCurrentStepData() {
+            const formData = {};
+            
+            // 保存所有表单字段
+            document.querySelectorAll('.form-input').forEach(input => {
+                if (input.id) {
+                    formData[input.id] = input.value;
+                }
+            });
+            
+            // 保存时间线数据
+            const timelineData = [];
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                const date = item.querySelector('.timeline-date').value;
+                const event = item.querySelector('.timeline-event').value;
+                if (date || event) {
+                    timelineData.push({ date, event });
+                }
+            });
+            formData.timeline = timelineData;
+            
+            // 保存业务数据
+            const businessData = [];
+            document.querySelectorAll('.business-item').forEach(item => {
+                const name = item.querySelector('.business-name').value;
+                const desc = item.querySelector('.business-desc').value;
+                if (name || desc) {
+                    businessData.push({ name, desc });
+                }
+            });
+            formData.business = businessData;
+            
+            // 保存荣誉数据
+            const honorData = [];
+            document.querySelectorAll('.honor-item').forEach(item => {
+                const year = item.querySelector('.honor-year').value;
+                const name = item.querySelector('.honor-name').value;
+                const org = item.querySelector('.honor-org').value;
+                if (year || name || org) {
+                    honorData.push({ year, name, org });
+                }
+            });
+            formData.honors = honorData;
+            
+            localStorage.setItem('companyData', JSON.stringify(formData));
+        }
+
+        function loadSavedData() {
+            const savedData = localStorage.getItem('companyData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                
+                // 加载基本字段
+                Object.keys(formData).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element && typeof formData[key] === 'string') {
+                        element.value = formData[key];
+                    }
+                });
+                
+                // 加载时间线数据
+                if (formData.timeline && formData.timeline.length > 0) {
+                    const container = document.getElementById('timelineContainer');
+                    container.innerHTML = '';
+                    formData.timeline.forEach(item => {
+                        addTimelineItem();
+                        const items = container.querySelectorAll('.timeline-item');
+                        const lastItem = items[items.length - 1];
+                        lastItem.querySelector('.timeline-date').value = item.date || '';
+                        lastItem.querySelector('.timeline-event').value = item.event || '';
+                    });
+                }
+                
+                // 加载业务数据
+                if (formData.business && formData.business.length > 0) {
+                    const container = document.getElementById('businessContainer');
+                    container.innerHTML = '';
+                    formData.business.forEach(item => {
+                        addBusinessItem();
+                        const items = container.querySelectorAll('.business-item');
+                        const lastItem = items[items.length - 1];
+                        lastItem.querySelector('.business-name').value = item.name || '';
+                        lastItem.querySelector('.business-desc').value = item.desc || '';
+                    });
+                }
+                
+                // 加载荣誉数据
+                if (formData.honors && formData.honors.length > 0) {
+                    const container = document.getElementById('honorContainer');
+                    container.innerHTML = '';
+                    formData.honors.forEach(item => {
+                        addHonorItem();
+                        const items = container.querySelectorAll('.honor-item');
+                        const lastItem = items[items.length - 1];
+                        lastItem.querySelector('.honor-year').value = item.year || '';
+                        lastItem.querySelector('.honor-name').value = item.name || '';
+                        lastItem.querySelector('.honor-org').value = item.org || '';
+                    });
+                }
+            }
+        }
+
+        // 生成预览内容
+        function generatePreview() {
+            saveCurrentStepData();
+            const savedData = localStorage.getItem('companyData');
+            if (!savedData) {
+                document.getElementById('previewContent').innerHTML = '<p style="color: #64748b; text-align: center; padding: 40px;">暂无数据，请先填写企业信息</p>';
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            let previewHtml = '';
+            
+            // 生成预览内容
+            if (data.companyName) {
+                previewHtml += `<h1 style="color: #1e293b; margin-bottom: 20px; font-size: 1.8rem;">${data.companyName}</h1>`;
+                
+                // 基本信息段落
+                let basicInfo = [];
+                if (data.foundDate) basicInfo.push(`成立于${data.foundDate}`);
+                if (data.legalPerson) basicInfo.push(`法定代表人${data.legalPerson}`);
+                if (data.industry) basicInfo.push(`所属行业${data.industry}`);
+                
+                if (basicInfo.length > 0) {
+                    previewHtml += `<p style="margin-bottom: 15px; line-height: 1.6;">${data.companyName}是一家${basicInfo.join('，')}的企业。</p>`;
+                }
+                
+                if (data.mainBusiness) {
+                    previewHtml += `<p style="margin-bottom: 15px; line-height: 1.6;">${data.mainBusiness}</p>`;
+                }
+                
+                // 基本信息表格
+                previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">基本信息</h2>';
+                previewHtml += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">';
+                
+                const basicFields = [
+                    { label: '公司名称', value: data.companyName },
+                    { label: '外文名称', value: data.englishName },
+                    { label: '创始人', value: data.founder },
+                    { label: '成立时间', value: data.foundDate },
+                    { label: '总部地点', value: data.address },
+                    { label: '所属行业', value: data.industry },
+                    { label: '经营范围', value: data.businessScope }
+                ];
+                
+                basicFields.forEach(field => {
+                    if (field.value) {
+                        previewHtml += `
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f8fafc; font-weight: 500; width: 120px;">${field.label}</td>
+                                <td style="padding: 10px; border: 1px solid #e5e7eb;">${field.value}</td>
+                            </tr>
+                        `;
+                    }
+                });
+                
+                previewHtml += '</table>';
+                
+                // 发展历程
+                if (data.timeline && data.timeline.length > 0) {
+                    previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">发展历程</h2>';
+                    previewHtml += '<ul style="margin-bottom: 25px; padding-left: 20px;">';
+                    data.timeline.forEach(item => {
+                        if (item.date && item.event) {
+                            previewHtml += `<li style="margin-bottom: 8px;"><strong>${item.date}</strong> - ${item.event}</li>`;
+                        }
+                    });
+                    previewHtml += '</ul>';
+                }
+                
+                // 业务内容
+                if (data.business && data.business.length > 0) {
+                    previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">公司业务</h2>';
+                    data.business.forEach(item => {
+                        if (item.name && item.desc) {
+                            previewHtml += `<h3 style="color: #4b5563; margin: 20px 0 10px 0; font-size: 1.1rem;">${item.name}</h3>`;
+                            previewHtml += `<p style="margin-bottom: 15px; line-height: 1.6;">${item.desc}</p>`;
+                        }
+                    });
+                }
+                
+                // 公司规模
+                const scaleFields = [
+                    { label: '员工总数', value: data.employeeCount ? `${data.employeeCount}人` : null },
+                    { label: '注册资本', value: data.registeredCapital },
+                    { label: '分支机构', value: data.branchCount ? `${data.branchCount}个` : null },
+                    { label: '年营业额', value: data.revenue }
+                ];
+                
+                const hasScaleData = scaleFields.some(field => field.value);
+                if (hasScaleData) {
+                    previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">公司规模</h2>';
+                    previewHtml += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">';
+                    scaleFields.forEach(field => {
+                        if (field.value) {
+                            previewHtml += `
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #e5e7eb; background: #f8fafc; font-weight: 500; width: 120px;">${field.label}</td>
+                                    <td style="padding: 10px; border: 1px solid #e5e7eb;">${field.value}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    previewHtml += '</table>';
+                }
+                
+                if (data.coverage) {
+                    previewHtml += `<p style="margin-bottom: 15px; line-height: 1.6;">${data.coverage}</p>`;
+                }
+                
+                // 所获荣誉
+                if (data.honors && data.honors.length > 0) {
+                    previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">所获荣誉</h2>';
+                    previewHtml += '<ul style="margin-bottom: 25px; padding-left: 20px;">';
+                    data.honors.forEach(item => {
+                        if (item.year && item.name) {
+                            previewHtml += `<li style="margin-bottom: 8px;"><strong>${item.year}</strong> - ${item.name}`;
+                            if (item.org) previewHtml += `（${item.org}）`;
+                            previewHtml += '</li>';
+                        }
+                    });
+                    previewHtml += '</ul>';
+                }
+                
+                // 企业文化
+                const cultureFields = [
+                    { label: '企业愿景', value: data.vision },
+                    { label: '企业使命', value: data.mission },
+                    { label: '核心价值观', value: data.values }
+                ];
+                
+                const hasCultureData = cultureFields.some(field => field.value);
+                if (hasCultureData) {
+                    previewHtml += '<h2 style="color: #374151; margin: 30px 0 15px 0; font-size: 1.3rem;">企业文化</h2>';
+                    cultureFields.forEach(field => {
+                        if (field.value) {
+                            previewHtml += `<h3 style="color: #4b5563; margin: 20px 0 10px 0; font-size: 1.1rem;">${field.label}</h3>`;
+                            previewHtml += `<p style="margin-bottom: 15px; line-height: 1.6;">${field.value}</p>`;
+                        }
+                    });
+                }
+            }
+            
+            document.getElementById('previewContent').innerHTML = previewHtml || '<p style="color: #64748b; text-align: center; padding: 40px;">暂无内容，请先填写企业信息</p>';
+        }
+
+        // 导出功能
+        function exportBlankTemplate() {
+            // 创建空白模板内容
+            const blankTemplate = `
+百科矩阵 · 企业百科词条模板
+
+【基本信息】
+公司名称：[请填写公司全称]
+外文名称：[请填写英文名称]
+创始人：[请填写创始人姓名]
+成立时间：[请填写成立日期]
+总部地点：[请填写公司地址]
+所属行业：[请填写所属行业]
+经营范围：[请填写详细经营范围]
+
+【公司概况】
+主营业务：[请描述公司核心业务]
+融资情况：[请描述融资历程]
+
+【发展历程】
+[年份] - [重要事件描述]
+[年份] - [重要事件描述]
+...
+
+【公司业务】
+业务板块一：[业务名称]
+[详细业务描述]
+
+业务板块二：[业务名称]
+[详细业务描述]
+...
+
+【公司规模】
+员工总数：[人数]
+注册资本：[金额]
+分支机构：[数量]
+年营业额：[金额]
+业务覆盖：[覆盖范围描述]
+
+【所获荣誉】
+[年份] - [奖项名称]（[颁奖机构]）
+[年份] - [奖项名称]（[颁奖机构]）
+...
+
+【企业文化】
+企业愿景：[愿景描述]
+企业使命：[使命描述]
+核心价值观：[价值观描述]
+
+---
+由百科矩阵企业百科词条模板生成器创建
+            `;
+            
+            downloadTextFile('百科矩阵-企业百科词条空白模板.txt', blankTemplate.trim());
+            showToast('空白模板下载成功！', 'success');
+        }
+
+        function exportFilledContent() {
+            const savedData = localStorage.getItem('companyData');
+            if (!savedData) {
+                showToast('请先填写企业信息再导出', 'warning');
+                return;
+            }
+            
+            const data = JSON.parse(savedData);
+            let content = `${data.companyName || '[公司名称]'}企业百科词条\n\n`;
+            
+            // 概述段落
+            if (data.companyName) {
+                let overview = `${data.companyName}`;
+                if (data.foundDate) overview += `成立于${data.foundDate}`;
+                if (data.legalPerson) overview += `，法定代表人${data.legalPerson}`;
+                if (data.industry) overview += `，所属行业${data.industry}`;
+                overview += '。';
+                
+                if (data.mainBusiness) {
+                    overview += `\n\n${data.mainBusiness}`;
+                }
+                
+                content += overview + '\n\n';
+            }
+            
+            // 基本信息
+            content += '【基本信息】\n';
+            if (data.companyName) content += `公司名称：${data.companyName}\n`;
+            if (data.englishName) content += `外文名称：${data.englishName}\n`;
+            if (data.founder) content += `创始人：${data.founder}\n`;
+            if (data.foundDate) content += `成立时间：${data.foundDate}\n`;
+            if (data.address) content += `总部地点：${data.address}\n`;
+            if (data.industry) content += `所属行业：${data.industry}\n`;
+            if (data.businessScope) content += `经营范围：${data.businessScope}\n`;
+            content += '\n';
+            
+            // 发展历程
+            if (data.timeline && data.timeline.length > 0) {
+                content += '【发展历程】\n';
+                data.timeline.forEach(item => {
+                    if (item.date && item.event) {
+                        content += `${item.date} - ${item.event}\n`;
+                    }
+                });
+                content += '\n';
+            }
+            
+            // 业务内容
+            if (data.business && data.business.length > 0) {
+                content += '【公司业务】\n';
+                data.business.forEach(item => {
+                    if (item.name && item.desc) {
+                        content += `${item.name}\n${item.desc}\n\n`;
+                    }
+                });
+            }
+            
+            // 公司规模
+            const hasScaleData = data.employeeCount || data.registeredCapital || data.branchCount || data.revenue || data.coverage;
+            if (hasScaleData) {
+                content += '【公司规模】\n';
+                if (data.employeeCount) content += `员工总数：${data.employeeCount}人\n`;
+                if (data.registeredCapital) content += `注册资本：${data.registeredCapital}\n`;
+                if (data.branchCount) content += `分支机构：${data.branchCount}个\n`;
+                if (data.revenue) content += `年营业额：${data.revenue}\n`;
+                if (data.coverage) content += `业务覆盖：${data.coverage}\n`;
+                content += '\n';
+            }
+            
+            // 所获荣誉
+            if (data.honors && data.honors.length > 0) {
+                content += '【所获荣誉】\n';
+                data.honors.forEach(item => {
+                    if (item.year && item.name) {
+                        content += `${item.year} - ${item.name}`;
+                        if (item.org) content += `（${item.org}）`;
+                        content += '\n';
+                    }
+                });
+                content += '\n';
+            }
+            
+            // 企业文化
+            const hasCultureData = data.vision || data.mission || data.values;
+            if (hasCultureData) {
+                content += '【企业文化】\n';
+                if (data.vision) content += `企业愿景：${data.vision}\n\n`;
+                if (data.mission) content += `企业使命：${data.mission}\n\n`;
+                if (data.values) content += `核心价值观：${data.values}\n\n`;
+            }
+            
+            content += '\n---\n由百科矩阵企业百科词条模板生成器创建';
+            
+            const filename = `${data.companyName || '企业'}百科词条-百科矩阵.txt`;
+            downloadTextFile(filename, content.trim());
+            showToast('企业词条导出成功！', 'success');
+        }
+
+        function downloadTextFile(filename, content) {
+            const element = document.createElement('a');
+            const file = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            element.href = URL.createObjectURL(file);
+            element.download = filename;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // 提示信息
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 实时保存数据
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('form-input')) {
+                // 延迟保存，避免频繁操作
+                clearTimeout(window.saveTimeout);
+                window.saveTimeout = setTimeout(() => {
+                    saveCurrentStepData();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
